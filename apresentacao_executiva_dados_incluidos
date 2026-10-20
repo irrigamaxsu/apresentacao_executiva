@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IrrigaMax - Apresentação Executiva de Projectos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#1C75BC',
+                            lightBlue: '#2B80C5',
+                            green: '#559334',
+                            darkGreen: '#3d6c23',
+                            charcoal: '#2C3E50',
+                            sand: '#F4F1EA',
+                            accent: '#D97706'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-viewport {
+            width: 100%;
+            max-width: 1120px;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            background-color: #f8fafc;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.3s ease;
+        }
+
+        .slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(241, 245, 249, 0.92) 100%);
+            backdrop-filter: blur(2px);
+            z-index: 1;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        [contenteditable="true"] {
+            outline: none;
+            transition: all 0.2s ease;
+            border-bottom: 1.5px dashed transparent;
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+        [contenteditable="true"]:hover {
+            background-color: rgba(28, 117, 188, 0.08);
+            border-bottom-color: #1C75BC;
+        }
+        [contenteditable="true"]:focus {
+            background-color: rgba(28, 117, 188, 0.15);
+            border-bottom: 2px solid #1C75BC;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .slide-page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            height: 100%;
+        }
+        .slide-page.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .logo-img-container img {
+            max-height: 42px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .slide-viewport {
+                max-width: 100% !important;
+                width: 100% !important;
+                height: 100vh !important;
+                aspect-ratio: auto !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                border-radius: 0 !important;
+                border: none !important;
+            }
+            .slide-page {
+                display: flex !important;
+                opacity: 1 !important;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-2 md:p-6 bg-slate-950 text-slate-100">
+
+    <!-- Painel de Controle -->
+    <header class="no-print w-full max-w-5xl mb-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-blue flex items-center justify-center text-white font-bold shadow-md">
+                    <i class="fa-solid fa-droplet text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-extrabold text-lg text-white leading-tight tracking-wide">IrrigaMax</h1>
+                    <p class="text-xs text-slate-400">Gestão de Identidade Visual & Apresentações</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+                <button onclick="toggleAssetPanel()" class="text-xs px-3 py-2 rounded-xl bg-brand-blue hover:bg-brand-lightBlue text-white font-semibold transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-image"></i> Carregar Logo / Fundo Local
+                </button>
+                <button onclick="window.print()" class="text-xs px-3.5 py-2 rounded-xl bg-brand-green hover:bg-brand-darkGreen text-white font-semibold transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-file-pdf"></i> Exportar PDF / Imprimir
+                </button>
+                <button onclick="toggleFullscreen()" class="text-xs px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-expand"></i> Tela Cheia
+                </button>
+            </div>
+        </div>
+
+        <div id="assetPanel" class="hidden bg-slate-950/80 p-4 rounded-xl border border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-4 mt-1 transition-all">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-upload text-brand-blue"></i> Carregar Logotipo Oficial (Logotipo.jpg)
+                </label>
+                <div class="flex items-center gap-2">
+                    <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-blue file:text-white hover:file:bg-brand-lightBlue cursor-pointer bg-slate-900 rounded-lg border border-slate-800">
+                    <button onclick="removeCustomLogo()" title="Remover Logo" class="p-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-image text-brand-green"></i> Carregar Imagem de Fundo (ImagemFundo.png)
+                </label>
+                <div class="flex items-center gap-2">
+                    <input type="file" id="bgInput" accept="image/*" onchange="handleBgUpload(this)" class="block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-green file:text-white hover:file:bg-brand-darkGreen cursor-pointer bg-slate-900 rounded-lg border border-slate-800">
+                    <button onclick="removeCustomBg()" title="Remover Fundo" class="p-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SLIDE VIEWPORT CANVAS -->
+    <div id="presentationContainer" class="slide-viewport rounded-2xl overflow-hidden border border-slate-800 relative select-none">
+        <div class="slide-overlay"></div>
+
+        <div class="slide-content p-6 md:p-10">
+            <!-- Top Bar -->
+            <div class="flex items-center justify-between w-full mb-2">
+                <div id="slideCounterBadge" class="bg-brand-charcoal text-white text-xs font-extrabold px-3.5 py-1 rounded-full shadow-md border border-slate-700">
+                    1/6
+                </div>
+                <div id="logoContainer" class="logo-img-container flex items-center gap-2 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+                    <svg id="defaultLogoSvg" class="w-7 h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 8 C50 8, 80 42, 80 62 C80 78.5, 66.5 92, 50 92 C33.5 92, 20 78.5, 20 62 C20 42, 50 8, 50 8 Z" fill="#1C75BC"/>
+                        <path d="M25 68 C 35 55, 65 55, 75 68 C 65 82, 35 82, 25 68 Z" fill="#559334"/>
+                        <circle cx="50" cy="50" r="4" fill="white"/>
+                    </svg>
+                    <span id="logoText" class="font-heading font-extrabold text-xs md:text-sm tracking-wider text-brand-charcoal uppercase">IRRIGAMAX</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 1: CAPA DO PROJECTO -->
+            <div id="slide-1" class="slide-page active flex-col justify-between">
+                <div class="mt-4 md:mt-6">
+                    <div class="inline-block px-3 py-1 mb-3 rounded-md bg-brand-green/10 text-brand-green font-bold text-xs uppercase tracking-wider border border-brand-green/20">
+                        Apresentação Executiva do Projecto
+                    </div>
+                    
+                    <h1 class="font-heading font-extrabold text-2xl md:text-4xl text-slate-900 tracking-tight uppercase leading-tight mb-2" contenteditable="true">
+                        PROJECTO DE IRRIGAÇÃO LOCALIZADA
+                    </h1>
+                    
+                    <div class="w-24 h-1.5 bg-brand-green rounded-full mb-4"></div>
+                    
+                    <h2 class="text-base md:text-xl font-medium text-brand-blue mb-6" contenteditable="true">
+                        Dimensionamento completo do sistema de irrigação
+                    </h2>
+
+                    <div class="bg-white/75 backdrop-blur-md p-4 md:p-5 rounded-2xl border border-white shadow-sm max-w-2xl">
+                        <ul class="space-y-2.5 text-xs md:text-sm font-semibold text-slate-700">
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-brand-green text-sm"></i> <span contenteditable="true">Aspectos Agronômicos</span></li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-brand-green text-sm"></i> <span contenteditable="true">Dimensionamento hidráulico</span></li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-brand-green text-sm"></i> <span contenteditable="true">Linhas laterais, principal, adutora e bombeamento</span></li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-brand-green text-sm"></i> <span contenteditable="true">Eficiência e uniformidade na aplicação</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-300/80 flex flex-wrap justify-between items-end text-xs text-slate-700 gap-2">
+                    <div>
+                        <p class="font-extrabold text-slate-900" contenteditable="true">IrrigaMax, Serviços e Consultoria, SU, LDA</p>
+                        <p contenteditable="true"><i class="fa-solid fa-location-dot text-brand-blue mr-1"></i> Niassa, Moçambique</p>
+                    </div>
+                    <div class="text-right">
+                        <p contenteditable="true"><i class="fa-solid fa-phone text-brand-green mr-1"></i> Contacto: +258 864038352 / +258 827920806</p>
+                        <p contenteditable="true"><i class="fa-solid fa-envelope text-brand-blue mr-1"></i> irrigamax.su@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: DADOS DO PROJECTO -->
+            <div id="slide-2" class="slide-page flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-300 pb-2 mb-4">
+                        <div>
+                            <h2 class="font-heading font-extrabold text-xl md:text-2xl text-slate-900 uppercase tracking-tight" contenteditable="true">
+                                DADOS DO PROJECTO
+                            </h2>
+                            <div class="w-16 h-1 bg-brand-green rounded-full mt-1"></div>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                            <i class="fa-solid fa-clipboard-list text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-md rounded-2xl p-4 md:p-5 border border-white shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-xs md:text-sm">
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Área irrigada:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">1.20 ha (12.000 m²)</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Espaçamento (Si x Sl):</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">1.00 m x 6.00 m</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Cultura:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">Projecto de Irrigação Localizada</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Horas de trabalho disponíveis por dia:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">7.2 h/dia</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Emissor adoptado:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">Turbulento Não-Compensante</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Eficiência de aplicação:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">90.0 %</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Vazão do emissor:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">4.00 L/h</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200">
+                                <span class="font-medium text-slate-600">Uniformidade:</span>
+                                <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded" contenteditable="true">CUC: 90.7% | EU: 85.9%</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-200 md:col-span-2">
+                                <span class="font-medium text-slate-600">Pressão média:</span>
+                                <span class="font-bold text-brand-blue bg-blue-50 px-2.5 py-0.5 rounded" contenteditable="true">10.0 m.c.a</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right text-[11px] text-slate-600 font-semibold">
+                    IrrigaMax • Consultoria e Engenharia de Irrigação
+                </div>
+            </div>
+
+            <!-- SLIDE 3: DIMENSIONAMENTO AGRONÔMICO -->
+            <div id="slide-3" class="slide-page flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-300 pb-2 mb-3">
+                        <div>
+                            <h2 class="font-heading font-extrabold text-xl md:text-2xl text-slate-900 uppercase tracking-tight" contenteditable="true">
+                                DIMENSIONAMENTO AGRONÔMICO
+                            </h2>
+                            <div class="w-16 h-1 bg-brand-green rounded-full mt-1"></div>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-brand-green/10 flex items-center justify-center text-brand-green">
+                            <i class="fa-solid fa-wheat-awn text-lg"></i>
+                        </div>
+                    </div>
+
+                    <p class="text-xs font-bold text-brand-green uppercase tracking-wide mb-3" contenteditable="true">
+                        Necessidade de água da cultura
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm">
+                        <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white shadow-sm space-y-2">
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span class="text-slate-600">Evapotranspiração da cultura (ETc):</span>
+                                <span class="font-bold text-slate-900" contenteditable="true">4.56 mm/dia</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span class="text-slate-600">Coeficiente de cultura (Kc):</span>
+                                <span class="font-bold text-slate-900" contenteditable="true">0.70</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span class="text-slate-600">Precipitação efectiva (Pe):</span>
+                                <span class="font-bold text-slate-900" contenteditable="true">0.0 mm/dia</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span class="text-slate-600">Necessidade de irrigação líquida (LL):</span>
+                                <span class="font-bold text-slate-900" contenteditable="true">3.29 mm/dia</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200">
+                                <span class="text-slate-600">Necessidade de irrigação bruta (LB):</span>
+                                <span class="font-bold text-brand-blue" contenteditable="true">4.81 mm/dia</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white shadow-sm flex flex-col justify-between space-y-2">
+                            <div>
+                                <h3 class="font-bold text-slate-800 mb-1">Intensidade de aplicação (Ia) Emissor:</h3>
+                                <div class="bg-slate-100 p-2 rounded-xl font-mono text-center text-sm font-bold text-slate-800" contenteditable="true">
+                                    Ia = 0.67 mm/h
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 mb-1">Tempo de irrigação diária (Ti):</h3>
+                                <div class="bg-blue-50 p-2 rounded-xl font-mono text-center text-sm font-bold text-brand-blue" contenteditable="true">
+                                    Ti = 7.21 h (433 min)
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 mb-1">Frequência de irrigação:</h3>
+                                <div class="bg-green-50 p-2 rounded-xl font-mono text-center text-sm font-bold text-brand-green" contenteditable="true">
+                                    Intervalo (TR) = 1 dia (Diária)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right text-[11px] text-slate-600 font-semibold">
+                    IrrigaMax • Dimensionamento Agronômico de Precisão
+                </div>
+            </div>
+
+            <!-- SLIDE 4: DIMENSIONAMENTO DAS LINHAS -->
+            <div id="slide-4" class="slide-page flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-300 pb-2 mb-3">
+                        <div>
+                            <h2 class="font-heading font-extrabold text-xl md:text-2xl text-slate-900 uppercase tracking-tight" contenteditable="true">
+                                DIMENSIONAMENTO DAS LINHAS
+                            </h2>
+                            <div class="w-16 h-1 bg-brand-green rounded-full mt-1"></div>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                            <i class="fa-solid fa-diagram-project text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm">
+                        <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white shadow-sm">
+                            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-200">
+                                <h3 class="font-bold text-brand-green text-sm uppercase" contenteditable="true">Linha Lateral (PE)</h3>
+                                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">DN 13.8 MM</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Diâmetro interno:</span>
+                                    <span class="font-bold text-slate-900" contenteditable="true">13.8 mm</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Comprimento lateral:</span>
+                                    <span class="font-bold text-slate-900" contenteditable="true">100 m</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Vazão total lateral:</span>
+                                    <span class="font-bold text-slate-900" contenteditable="true">400 L/h (0.40 m³/h)</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Perda de carga (hf):</span>
+                                    <span class="font-bold text-slate-900 text-red-600" contenteditable="true">0.33 m.c.a</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span class="text-slate-600">Variação de pressão (ΔP):</span>
+                                    <span class="font-bold text-brand-green" contenteditable="true">3.3 % (Excelente)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white shadow-sm">
+                            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-200">
+                                <h3 class="font-bold text-brand-blue text-sm uppercase" contenteditable="true">Linha Derivação (PVC)</h3>
+                                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">DN 32 MM</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Diâmetro adoptado:</span>
+                                    <span class="font-bold text-slate-900" contenteditable="true">32 mm</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Comprimento:</span>
+                                    <span class="font-bold text-slate-900" contenteditable="true">120.0 m</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Vazão de entrada:</span>
+                                    <span class="font-bold text-slate-900" contenteditable="true">8.00 m³/h</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-600">Perda de carga (hf):</span>
+                                    <span class="font-bold text-red-600" contenteditable="true">1.51 m.c.a</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span class="text-slate-600">Velocidade da água:</span>
+                                    <span class="font-bold text-brand-blue" contenteditable="true">1.38 m/s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right text-[11px] text-slate-600 font-semibold">
+                    IrrigaMax • Dimensionamento das Tubagens
+                </div>
+            </div>
+
+            <!-- SLIDE 5: SISTEMA HIDRÁULICO -->
+            <div id="slide-5" class="slide-page flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-300 pb-2 mb-3">
+                        <div>
+                            <h2 class="font-heading font-extrabold text-xl md:text-2xl text-slate-900 uppercase tracking-tight" contenteditable="true">
+                                SISTEMA HIDRÁULICO
+                            </h2>
+                            <div class="w-16 h-1 bg-brand-green rounded-full mt-1"></div>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-brand-green/10 flex items-center justify-center text-brand-green">
+                            <i class="fa-solid fa-water text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm">
+                        <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white shadow-sm">
+                            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-200">
+                                <h3 class="font-bold text-brand-green text-sm uppercase" contenteditable="true">Adutora</h3>
+                                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">DN 125 MM</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Vazão total:</span><span class="font-bold text-slate-900" contenteditable="true">8.00 m³/h</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Comprimento:</span><span class="font-bold text-slate-900" contenteditable="true">100 m</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Diâmetro adoptado:</span><span class="font-bold text-slate-900" contenteditable="true">125 mm</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Velocidade:</span><span class="font-bold text-slate-900" contenteditable="true">0.18 m/s</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Perda de carga:</span><span class="font-bold text-red-600" contenteditable="true">0.05 m.c.a</span></div>
+                                <div class="flex justify-between py-1"><span class="text-slate-600">Elevação estática:</span><span class="font-bold text-slate-900" contenteditable="true">3 m</span></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white shadow-sm">
+                            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-200">
+                                <h3 class="font-bold text-brand-blue text-sm uppercase" contenteditable="true">Sução</h3>
+                                <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">DN 125 MM</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Vazão total:</span><span class="font-bold text-slate-900" contenteditable="true">8.00 m³/h</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Comprimento:</span><span class="font-bold text-slate-900" contenteditable="true">5 m</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Diâmetro adoptado:</span><span class="font-bold text-slate-900" contenteditable="true">125 mm</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Velocidade:</span><span class="font-bold text-slate-900" contenteditable="true">0.18 m/s</span></div>
+                                <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-600">Perda de carga:</span><span class="font-bold text-red-600" contenteditable="true">0.04 m.c.a</span></div>
+                                <div class="flex justify-between py-1"><span class="text-slate-600">Altura estática sução:</span><span class="font-bold text-slate-900" contenteditable="true">2 m</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 bg-green-50/90 border border-green-200 rounded-xl p-2.5 text-slate-700 text-xs italic flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-brand-green text-sm"></i>
+                        <span contenteditable="true">Todas as perdas de carga contínuas e localizadas foram contabilizadas e somadas para definir a altura manométrica do projecto.</span>
+                    </div>
+                </div>
+
+                <div class="text-right text-[11px] text-slate-600 font-semibold">
+                    IrrigaMax • Rede Hidráulica
+                </div>
+            </div>
+
+            <!-- SLIDE 6: SISTEMA BOMBEAMENTO -->
+            <div id="slide-6" class="slide-page flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-300 pb-2 mb-3">
+                        <div>
+                            <h2 class="font-heading font-extrabold text-xl md:text-2xl text-slate-900 uppercase tracking-tight" contenteditable="true">
+                                SISTEMA BOMBEAMENTO
+                            </h2>
+                            <div class="w-16 h-1 bg-brand-green rounded-full mt-1"></div>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                            <i class="fa-solid fa-bolt text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-md rounded-2xl p-4 md:p-5 border border-white shadow-sm max-w-2xl mx-auto space-y-2.5 text-xs md:text-sm">
+                        <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                            <span class="font-medium text-slate-600">Pressão de serviço:</span>
+                            <span class="font-bold text-slate-900" contenteditable="true">11.84 m.c.a</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                            <span class="font-medium text-slate-600">Perda de carga total:</span>
+                            <span class="font-bold text-red-600" contenteditable="true">0.08 m.c.a</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-slate-200 bg-blue-50/50 px-2 rounded-lg">
+                            <span class="font-extrabold text-slate-800">Altura manométrica total (AMT / TDH):</span>
+                            <span class="font-extrabold text-brand-blue text-sm md:text-base" contenteditable="true">16.93 m.c.a</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                            <span class="font-medium text-slate-600">Potencial calculada:</span>
+                            <span class="font-bold text-slate-900" contenteditable="true">0.67 cv (0.49 kW)</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                            <span class="font-medium text-slate-600">Potência adoptada:</span>
+                            <span class="font-bold text-brand-green" contenteditable="true">0.8 cv (0.55 kW)</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                            <span class="font-medium text-slate-600">Rendimento da bomba:</span>
+                            <span class="font-bold text-slate-900" contenteditable="true">75.0 %</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-brand-green/10 border border-brand-green/30 rounded-2xl p-3 text-slate-800 text-xs italic flex items-center gap-3">
+                        <i class="fa-solid fa-star text-brand-green text-base"></i>
+                        <p contenteditable="true">
+                            O projecto garante atender a demanda hídrica da cultura, uniformidade e eficiência de aplicação de água, contribuindo para alta productividade da cultura e sustentabilidade do investimento.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-right text-[11px] text-slate-600 font-semibold">
+                    IrrigaMax • Sistema de Bombeamento e Energia
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Navegação Inferior -->
+    <footer class="no-print w-full max-w-5xl mt-4 flex items-center justify-between gap-4">
+        <button onclick="prevSlide()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs md:text-sm transition flex items-center gap-2 border border-slate-700 shadow">
+            <i class="fa-solid fa-arrow-left"></i> Anterior
+        </button>
+
+        <div class="flex items-center gap-1.5" id="dotsContainer"></div>
+
+        <button onclick="nextSlide()" class="px-5 py-2.5 rounded-xl bg-brand-blue hover:bg-brand-lightBlue text-white font-semibold text-xs md:text-sm transition flex items-center gap-2 shadow">
+            Próximo <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 6;
+
+        function updateSlideUI() {
+            document.querySelectorAll('.slide-page').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            const activeSlide = document.getElementById(`slide-${currentSlide}`);
+            if (activeSlide) activeSlide.classList.add('active');
+
+            document.getElementById('slideCounterBadge').innerText = `${currentSlide}/${totalSlides}`;
+
+            const dotsContainer = document.getElementById('dotsContainer');
+            dotsContainer.innerHTML = '';
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.className = `w-3 h-3 rounded-full transition-all ${i === currentSlide ? 'bg-brand-blue w-6' : 'bg-slate-700 hover:bg-slate-500'}`;
+                dot.onclick = () => goToSlide(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlideUI();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function toggleFullscreen() {
+            const container = document.getElementById('presentationContainer');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => alert(`Erro: ${err.message}`));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function toggleAssetPanel() {
+            const panel = document.getElementById('assetPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function handleLogoUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    localStorage.setItem('irrigamax_logo', dataUrl);
+                    applyLogo(dataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleBgUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    localStorage.setItem('irrigamax_bg', dataUrl);
+                    applyBg(dataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyLogo(src) {
+            const container = document.getElementById('logoContainer');
+            container.innerHTML = `<img src="${src}" alt="IrrigaMax Logo" class="h-8 md:h-10 w-auto object-contain">`;
+        }
+
+        function applyBg(src) {
+            const viewport = document.getElementById('presentationContainer');
+            viewport.style.backgroundImage = `url('${src}')`;
+        }
+
+        function removeCustomLogo() {
+            localStorage.removeItem('irrigamax_logo');
+            location.reload();
+        }
+
+        function removeCustomBg() {
+            localStorage.removeItem('irrigamax_bg');
+            location.reload();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateSlideUI();
+            const savedLogo = localStorage.getItem('irrigamax_logo');
+            if (savedLogo) applyLogo(savedLogo);
+
+            const savedBg = localStorage.getItem('irrigamax_bg');
+            if (savedBg) applyBg(savedBg);
+        });
+    </script>
+</body>
+</html>
